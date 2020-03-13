@@ -5,7 +5,6 @@
 
 int main() {
     initscr();			/* Start curses mode 		  */
-	printw("Hello World !!!");	/* Print Hello World		  */
 
 	RefPoint* mainRef = new RefPoint(0, 0);
 	VisibleObject* testObj = new VisibleObject(mainRef);

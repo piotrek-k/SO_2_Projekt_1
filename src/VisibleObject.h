@@ -8,8 +8,8 @@ private:
     RefPoint* refPoint;
     int posToRefX = 0;
     int posToRefY = 0;
-    int width=10;
-    int height=10;
+    int width=3;
+    int height=3;
 public:
     VisibleObject(RefPoint* refpoint);
     void draw();

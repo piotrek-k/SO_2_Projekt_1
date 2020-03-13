@@ -1,9 +1,9 @@
 #include "VisibleObject.h"
 #include <curses.h>
 
-VisibleObject::VisibleObject(RefPoint *refpoint)
+VisibleObject::VisibleObject(RefPoint *rp)
 {
-    this->refPoint = refPoint;
+    this->refPoint = rp;
 }
 
 void VisibleObject::draw()
