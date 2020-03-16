@@ -10,7 +10,7 @@ int main()
 	initscr(); /* Start curses mode 		  */
 
 	std::vector<VisibleObject *> objects;
-	Table t = Table(15, 15, 10);
+	Table t = Table(30, 15, 10, 2.0, 1.0);
 	for (int a = 0; a < 10; a++)
 	{
 		RefPoint *mainRef = new RefPoint(0, 0);

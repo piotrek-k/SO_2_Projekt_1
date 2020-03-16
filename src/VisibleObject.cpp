@@ -19,12 +19,12 @@ void VisibleObject::draw()
         {
             if (x == 0 || x == width - 1)
             {
-                mvaddch(finalX + x, finalY + y, '*');
+                mvaddch(finalY + y, finalX + x, '*');
             }
 
             if (y == 0 || y == height - 1)
             {
-                mvaddch(finalX + x, finalY + y, '*');
+                mvaddch(finalY + y, finalX + x, '*');
             }
         }
     }

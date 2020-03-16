@@ -12,8 +12,10 @@ private:
     int numberOfElements = 0;
     std::vector<RefPoint*> refPoints;
     int radius = 10;
+    float scaleX = 1;
+    float scaleY = 1;
 public:
-    Table(int posX, int posY, int radius);
+    Table(int posX, int posY, int radius, float scaleX, float scaleY);
     std::tuple<int, int> GetPosition();
     void AddElement(RefPoint* refPoint);
     void RecalculateRefPoints();

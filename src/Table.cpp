@@ -2,11 +2,13 @@
 #define PI 3.14159265
 #include <math.h> /* sin */
 
-Table::Table(int posX, int posY, int radius)
+Table::Table(int posX, int posY, int radius, float scaleX, float scaleY)
 {
     this->positionX = posX;
     this->positionY = posY;
     this->radius = radius;
+    this->scaleX = scaleX;
+    this->scaleY = scaleY;
 }
 
 std::tuple<int, int> Table::GetPosition()
@@ -26,8 +28,8 @@ void Table::RecalculateRefPoints()
     {
         float degrees = x * (360 / (float)refPoints.size());
         float radians = degrees * PI / 180;
-        int newPosX = sin(radians) * this->radius + this->positionX;
-        int newPosY = cos(radians) * this->radius + this->positionY;
+        int newPosX = sin(radians) * this->radius * this->scaleX + this->positionX;
+        int newPosY = cos(radians) * this->radius * this->scaleY + this->positionY;
 
         refPoints[x]->SetPosition(newPosX, newPosY);
     }
