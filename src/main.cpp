@@ -8,6 +8,8 @@
 #include <vector>
 #include <thread>
 
+#include "Globals.h"
+
 static void newThread(Philosopher *philObj)
 {
 	philObj->SimulateLife();
@@ -16,6 +18,10 @@ static void newThread(Philosopher *philObj)
 int main()
 {
 	initscr(); /* Start curses mode 		  */
+	start_color();
+	init_pair(PHILOSOPHER_COLOR, COLOR_YELLOW, COLOR_BLACK);
+	init_pair(FORK_COLOR, COLOR_CYAN, COLOR_BLACK);
+	init_pair(WAITING_COLOR, COLOR_RED, COLOR_BLACK);
 
 	std::vector<VisibleObject *> objects;
 	std::vector<std::thread *> threads;
@@ -69,13 +75,12 @@ int main()
 		{
 			objects[a]->redraw();
 		}
-		
+
 		refresh(); /* Print it on to the real screen */
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 
-	
 	//getch();   /* Wait for user input */
 	endwin();
 	return 0;

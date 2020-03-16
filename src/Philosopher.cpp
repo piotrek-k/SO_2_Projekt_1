@@ -6,6 +6,8 @@
 #include <exception>
 #include <curses.h>
 
+#include "Globals.h"
+
 void Philosopher::AssignFork(Fork* fork){
     this->availableForks.push_back(fork);
 }
@@ -50,18 +52,24 @@ void Philosopher::SimulateLife(){
 
 void Philosopher::iconGenerator(int finalObjX, int finalObjY)
 {
+    
+
     if (state == Contemplates)
     {
         mvprintw(finalObjY - 1, finalObjX, "%s", "Cont.");
     }
     else if (state == WaitsForEating)
     {
+        attron(COLOR_PAIR(WAITING_COLOR));
         mvprintw(finalObjY - 1, finalObjX, "%s", "Waits");
+        attroff(COLOR_PAIR(WAITING_COLOR));
     }
     else if (state == Eats)
     {
         mvprintw(finalObjY - 1, finalObjX, "%s", "Eats");
     }
+
+    attron(COLOR_PAIR(PHILOSOPHER_COLOR));
 
     for (int x = 0; x < width; x++)
     {
@@ -83,4 +91,6 @@ void Philosopher::iconGenerator(int finalObjX, int finalObjY)
             }
         }
     }
+
+    attroff(COLOR_PAIR(PHILOSOPHER_COLOR));
 }

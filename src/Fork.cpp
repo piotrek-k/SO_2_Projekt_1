@@ -1,5 +1,6 @@
 #include "Fork.h"
 #include <curses.h>
+#include "Globals.h"
 
 Fork::Fork(RefPoint *refpoint) : VisibleObject(refpoint)
 {
@@ -26,6 +27,8 @@ void Fork::PutDown()
 
 void Fork::iconGenerator(int finalObjX, int finalObjY)
 {
+    attron(COLOR_PAIR(FORK_COLOR));
+
     if (state == Free)
     {
         mvprintw(finalObjY - 1, finalObjX, "%s", "Free");
@@ -55,4 +58,6 @@ void Fork::iconGenerator(int finalObjX, int finalObjY)
             }
         }
     }
+
+    attroff(COLOR_PAIR(FORK_COLOR));
 }
