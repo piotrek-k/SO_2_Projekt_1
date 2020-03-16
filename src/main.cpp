@@ -6,12 +6,19 @@
 #include "Table.h"
 #include <curses.h>
 #include <vector>
+#include <thread>
+
+static void newThread(Philosopher *philObj)
+{
+	philObj->SimulateLife();
+}
 
 int main()
 {
 	initscr(); /* Start curses mode 		  */
 
 	std::vector<VisibleObject *> objects;
+	std::vector<std::thread *> threads;
 	Table t = Table(30, 15, 10, 2.0, 1.0);
 
 	Philosopher *firstPhilosopher = NULL;
@@ -24,7 +31,7 @@ int main()
 		t.AddElement(philRef);
 		if (lastFork != NULL)
 		{
-			firstPhilosopher->AssignFork(lastFork);
+			philObj->AssignFork(lastFork);
 		}
 
 		if (firstPhilosopher == NULL)
@@ -45,13 +52,31 @@ int main()
 		firstPhilosopher->AssignFork(lastFork);
 	}
 
-	for (int a = 0; a < 10; a++)
+	for (auto &obj : objects)
 	{
-		objects[a]->redraw();
+		if (Philosopher *p = dynamic_cast<Philosopher *>(obj))
+		{
+			std::thread *n_t = new std::thread(newThread, p);
+			threads.push_back(n_t);
+		}
 	}
 
-	refresh(); /* Print it on to the real screen */
-	getch();   /* Wait for user input */
+	while (true)
+	{
+		clear();
+
+		for (int a = 0; a < 10; a++)
+		{
+			objects[a]->redraw();
+		}
+		
+		refresh(); /* Print it on to the real screen */
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	}
+
+	
+	//getch();   /* Wait for user input */
 	endwin();
 	return 0;
 }

@@ -33,5 +33,5 @@ void VisibleObject::redraw()
 
     iconGenerator(finalX, finalY);
 
-    refresh();
+    //refresh();
 }
