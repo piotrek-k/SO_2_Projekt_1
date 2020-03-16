@@ -23,6 +23,7 @@ private:
 
 public:
     Philosopher(RefPoint *refpoint) : VisibleObject(refpoint) {}
+    void iconGenerator(int finalObjX, int finalObjY);
     void AssignFork(Fork *fork);
     void SimulateLife();
 };

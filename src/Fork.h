@@ -18,7 +18,8 @@ private:
     std::mutex mtx;
 
 public:
-    Fork(RefPoint *refpoint) : VisibleObject(refpoint) {}
+    Fork(RefPoint *refpoint);
+    void iconGenerator(int finalObjX, int finalObjY);
     bool TryToPickUp();
     void PutDown();
 };
