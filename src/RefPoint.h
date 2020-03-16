@@ -10,6 +10,8 @@ private:
 public:
     RefPoint(int posX, int posY);
     std::tuple<int, int> getPosition();
+    void SetPosition(std::tuple<int, int> newPos);
+    void SetPosition(int posX, int posY);
 };
 
 #endif //SO2_PROJEKT_IREFPOINT
