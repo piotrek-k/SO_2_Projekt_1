@@ -35,6 +35,7 @@ void Fork::PickUpSync()
 void Fork::PutDown()
 {
     this->mtx.unlock();
+    state = Free;
     this->redraw();
 }
 
@@ -45,6 +46,7 @@ void Fork::iconGenerator(int finalObjX, int finalObjY)
     if (state == Free)
     {
         mvprintw(finalObjY - 1, finalObjX, "%s", "Free");
+        attron(COLOR_PAIR(FREE_COLOR));
     }
     else if (state == Taken)
     {
@@ -70,6 +72,11 @@ void Fork::iconGenerator(int finalObjX, int finalObjY)
                 mvaddch(finalObjY + y, finalObjX + x, 'F');
             }
         }
+    }
+
+    if (state == Free)
+    {
+        attron(COLOR_PAIR(FREE_COLOR));
     }
 
     attroff(COLOR_PAIR(FORK_COLOR));

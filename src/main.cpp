@@ -35,6 +35,7 @@ int main(int argc, char *argv[])
 	init_pair(FORK_COLOR, COLOR_CYAN, COLOR_BLACK);
 	init_pair(WAITING_COLOR, COLOR_RED, COLOR_BLACK);
 	init_pair(EATING_COLOR, COLOR_GREEN, COLOR_BLACK);
+	init_pair(FREE_COLOR, COLOR_WHITE, COLOR_BLACK);
 
 	std::vector<VisibleObject *> objects;
 	std::vector<std::thread *> threads;
@@ -112,7 +113,7 @@ int main(int argc, char *argv[])
 		mvprintw(position+2, 5, "F - widelec");
 		mvprintw(position+3, 5, "<< - filozof uzywa lewego widelca");
 		mvprintw(position+4, 5, ">> - filozof uzywa prawego widelca");
-		mvprintw(position+4, 5, "Wcisniecie 'q' lub 'esc' zamyka program");
+		mvprintw(position+5, 5, "Wcisniecie 'q' lub 'esc' zamyka program");
 
 		refresh(); /* Print it on to the real screen */
 
