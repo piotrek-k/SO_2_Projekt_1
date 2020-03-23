@@ -18,7 +18,7 @@ class Philosopher : public VisibleObject
 private:
     PhilosopherState state = Contemplates;
     std::vector<Fork *> availableForks;
-    bool keepAlive = false;
+    bool keepAlive = true;
     int numOfCollectedForks = 0;
     bool leftForkTaken = false;
     bool rightForkTaken = false;
@@ -29,8 +29,9 @@ public:
     Philosopher(RefPoint *refpoint) : VisibleObject(refpoint) {}
     void iconGenerator(int finalObjX, int finalObjY);
     void AssignFork(Fork *fork);
-    void SimulateLife();
+    void SimulateLife(int eatingTime, int contemplatingTime);
     PhilosopherState GetState();
+    void Kill();
 };
 
 #endif //SO2_PROJEKT_PHILISOPHER

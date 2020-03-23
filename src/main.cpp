@@ -10,12 +10,24 @@
 
 #include "Globals.h"
 
-static void newThread(Philosopher *philObj)
+static void newThread(Philosopher *philObj, int eatingTime, int contemplatingTime)
 {
-	philObj->SimulateLife();
+	philObj->SimulateLife(eatingTime, contemplatingTime);
 }
 
-int main()
+static void waitForKey(bool *threadStop)
+{
+	while (true)
+	{
+		char key = getch();
+		if (key == 'q' || key == 27)
+		{
+			*threadStop = true;
+		}
+	}
+}
+
+int main(int argc, char *argv[])
 {
 	initscr(); /* Start curses mode 		  */
 	start_color();
@@ -28,9 +40,24 @@ int main()
 	std::vector<std::thread *> threads;
 	Table t = Table(30, 15, 10, 2.0, 1.0);
 
+	int numOfPhilosophers = 5;
+	int eatingTime = 2;
+	int contempTime = 3;
+	if (argc == 2)
+	{
+		numOfPhilosophers = atoi(argv[1]);
+	}
+
+	if (argc == 4)
+	{
+		numOfPhilosophers = atoi(argv[1]);
+		eatingTime = atoi(argv[2]);
+		contempTime = atoi(argv[3]);
+	}
+
 	Philosopher *firstPhilosopher = NULL;
 	Fork *lastFork = NULL;
-	for (int a = 0; a < 5; a++)
+	for (int a = 0; a < numOfPhilosophers; a++)
 	{
 		RefPoint *philRef = new RefPoint(0, 0);
 		Philosopher *philObj = new Philosopher(philRef);
@@ -63,23 +90,43 @@ int main()
 	{
 		if (Philosopher *p = dynamic_cast<Philosopher *>(obj))
 		{
-			std::thread *n_t = new std::thread(newThread, p);
+			std::thread *n_t = new std::thread(newThread, p, eatingTime, contempTime);
 			threads.push_back(n_t);
 		}
 	}
 
-	while (true)
+	bool appStop = false;
+	std::thread *n_t = new std::thread(waitForKey, &appStop);
+	while (!appStop)
 	{
 		clear();
 
-		for (int a = 0; a < 10; a++)
+		for (auto &obj : objects)
 		{
-			objects[a]->redraw();
+			obj->redraw();
 		}
 
 		refresh(); /* Print it on to the real screen */
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	}
+
+	for (auto &obj : objects)
+	{
+		if (Philosopher *p = dynamic_cast<Philosopher *>(obj))
+		{
+			p->Kill();
+		}
+	}
+
+	int counter = threads.size();
+	for (auto &t : threads)
+	{
+		clear();
+		mvprintw(5, 5, "Zamykanie. Oczekiwanie na zakonczenie watkow... (%d/%d)", counter, threads.size());
+		refresh();
+		t->join();
+		counter--;
 	}
 
 	//getch();   /* Wait for user input */

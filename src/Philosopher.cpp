@@ -23,62 +23,70 @@ void WaitingThread(Philosopher *p)
     }
 }
 
-void EatingThread(Philosopher *p, int timeMs){
+void EatingThread(Philosopher *p, int timeMs)
+{
     int timeLeft = timeMs;
-    while(timeLeft > 0){
+    while (timeLeft > 0)
+    {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         timeLeft -= 100;
 
-        p->eatingPercent = 100 - (timeLeft/(float)timeMs) * 100;
+        p->eatingPercent = 100 - (timeLeft / (float)timeMs) * 100;
         p->redraw();
     }
 }
 
-void Philosopher::SimulateLife()
+void Philosopher::Kill()
+{
+    this->keepAlive = false;
+}
+
+void Philosopher::SimulateLife(int eatingTime, int contemplatingTime)
 {
     if (this->availableForks.size() != 2)
     {
         throw "Brak wystarczajacej liczby widelcow";
     }
 
-    this->keepAlive = true;
+    //this->keepAlive = true;
     srand(time(NULL));
 
     while (this->keepAlive)
     {
         float randomNum = (rand() % 10) / (float)10;
-        int actionLength = (2 + randomNum) * 1000;
+        int eatingLength = (eatingTime + randomNum) * 1000;
+        int contempLength = (contemplatingTime + randomNum) * 1000;
         auto forkPickupRetryTime = std::chrono::milliseconds(100);
 
         this->state = Contemplates;
-        this->redraw();
-        std::this_thread::sleep_for(std::chrono::milliseconds(actionLength));
+        if (keepAlive)
+            this->redraw();
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(contempLength));
 
         this->state = WaitsForEating;
         std::thread *w_t = new std::thread(WaitingThread, this);
-        this->redraw();
+        if (keepAlive)
+            this->redraw();
+
+        if (!keepAlive)
+        {
+            break;
+        }
         availableForks[0]->PickUpSync();
         leftForkTaken = true;
-        // first fork
-        // while (!availableForks[0]->TryToPickUp())
-        // {
-        //     std::this_thread::sleep_for(forkPickupRetryTime);
-        // }
         numOfCollectedForks++;
         availableForks[1]->PickUpSync();
         rightForkTaken = true;
-        this->redraw();
-        // second fork
-        // while (!availableForks[1]->TryToPickUp())
-        // {
-        //     std::this_thread::sleep_for(forkPickupRetryTime);
-        // }
+        if (keepAlive)
+            this->redraw();
         numOfCollectedForks++;
 
         this->state = Eats;
-        std::thread *e_t = new std::thread(EatingThread, this, actionLength);
-        this->redraw();
-        std::this_thread::sleep_for(std::chrono::milliseconds(actionLength));
+        std::thread *e_t = new std::thread(EatingThread, this, eatingLength);
+        if (keepAlive)
+            this->redraw();
+        std::this_thread::sleep_for(std::chrono::milliseconds(eatingLength));
         availableForks[1]->PutDown();
         availableForks[0]->PutDown();
         leftForkTaken = false;
