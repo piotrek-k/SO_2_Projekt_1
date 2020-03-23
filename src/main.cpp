@@ -106,6 +106,14 @@ int main(int argc, char *argv[])
 			obj->redraw();
 		}
 
+		int position = 30;
+		mvprintw(position, 5, "Legenda:");
+		mvprintw(position+1, 5, "P - filozof");
+		mvprintw(position+2, 5, "F - widelec");
+		mvprintw(position+3, 5, "<< - filozof uzywa lewego widelca");
+		mvprintw(position+4, 5, ">> - filozof uzywa prawego widelca");
+		mvprintw(position+4, 5, "Wcisniecie 'q' lub 'esc' zamyka program");
+
 		refresh(); /* Print it on to the real screen */
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
