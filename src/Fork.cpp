@@ -16,7 +16,20 @@ bool Fork::TryToPickUp()
 
         state = Taken;
         this->redraw();
+
+        return true;
     }
+    else
+    {
+        return false;
+    }
+}
+
+void Fork::PickUpSync()
+{
+    this->mtx.lock();
+    state = Taken;
+    this->redraw();
 }
 
 void Fork::PutDown()

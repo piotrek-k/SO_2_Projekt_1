@@ -21,6 +21,7 @@ public:
     Fork(RefPoint *refpoint);
     void iconGenerator(int finalObjX, int finalObjY);
     bool TryToPickUp();
+    void PickUpSync();
     void PutDown();
 };
 

@@ -22,6 +22,7 @@ int main()
 	init_pair(PHILOSOPHER_COLOR, COLOR_YELLOW, COLOR_BLACK);
 	init_pair(FORK_COLOR, COLOR_CYAN, COLOR_BLACK);
 	init_pair(WAITING_COLOR, COLOR_RED, COLOR_BLACK);
+	init_pair(EATING_COLOR, COLOR_GREEN, COLOR_BLACK);
 
 	std::vector<VisibleObject *> objects;
 	std::vector<std::thread *> threads;

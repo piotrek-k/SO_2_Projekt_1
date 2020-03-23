@@ -1,58 +1,100 @@
 #include "Philosopher.h"
 #include <thread>
-#include <chrono> 
-#include <stdlib.h>     /* srand, rand */
-#include <time.h>       /* time */
+#include <chrono>
+#include <stdlib.h> /* srand, rand */
+#include <time.h>   /* time */
 #include <exception>
 #include <curses.h>
 
 #include "Globals.h"
 
-void Philosopher::AssignFork(Fork* fork){
+void Philosopher::AssignFork(Fork *fork)
+{
     this->availableForks.push_back(fork);
 }
 
-void Philosopher::SimulateLife(){
-    if(this->availableForks.size() != 2){
+void WaitingThread(Philosopher *p)
+{
+    while (p->GetState() == PhilosopherState::WaitsForEating)
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        p->waitingTime += 1;
+        p->redraw();
+    }
+}
+
+void EatingThread(Philosopher *p, int timeMs){
+    int timeLeft = timeMs;
+    while(timeLeft > 0){
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        timeLeft -= 100;
+
+        p->eatingPercent = 100 - (timeLeft/(float)timeMs) * 100;
+        p->redraw();
+    }
+}
+
+void Philosopher::SimulateLife()
+{
+    if (this->availableForks.size() != 2)
+    {
         throw "Brak wystarczajacej liczby widelcow";
     }
 
     this->keepAlive = true;
-    srand (time(NULL));
-    float randomNum = (rand() % 10)/10;
-    int actionLength = (2+randomNum) * 1000;
-    auto forkPickupRetryTime = std::chrono::milliseconds(100);
+    srand(time(NULL));
 
-    while(this->keepAlive){
+    while (this->keepAlive)
+    {
+        float randomNum = (rand() % 10) / (float)10;
+        int actionLength = (2 + randomNum) * 1000;
+        auto forkPickupRetryTime = std::chrono::milliseconds(100);
+
         this->state = Contemplates;
         this->redraw();
         std::this_thread::sleep_for(std::chrono::milliseconds(actionLength));
 
         this->state = WaitsForEating;
+        std::thread *w_t = new std::thread(WaitingThread, this);
         this->redraw();
+        availableForks[0]->PickUpSync();
+        leftForkTaken = true;
         // first fork
-        while(!availableForks[0]->TryToPickUp()){
-            std::this_thread::sleep_for(forkPickupRetryTime);
-        }
+        // while (!availableForks[0]->TryToPickUp())
+        // {
+        //     std::this_thread::sleep_for(forkPickupRetryTime);
+        // }
         numOfCollectedForks++;
+        availableForks[1]->PickUpSync();
+        rightForkTaken = true;
         this->redraw();
         // second fork
-        while(!availableForks[1]->TryToPickUp()){
-            std::this_thread::sleep_for(forkPickupRetryTime);
-        }
+        // while (!availableForks[1]->TryToPickUp())
+        // {
+        //     std::this_thread::sleep_for(forkPickupRetryTime);
+        // }
         numOfCollectedForks++;
 
         this->state = Eats;
+        std::thread *e_t = new std::thread(EatingThread, this, actionLength);
         this->redraw();
         std::this_thread::sleep_for(std::chrono::milliseconds(actionLength));
-        availableForks[0]->PutDown();
         availableForks[1]->PutDown();
+        availableForks[0]->PutDown();
+        leftForkTaken = false;
+        rightForkTaken = false;
+        numOfCollectedForks = 0;
+        waitingTime = 0;
     }
+}
+
+PhilosopherState Philosopher::GetState()
+{
+    return this->state;
 }
 
 void Philosopher::iconGenerator(int finalObjX, int finalObjY)
 {
-    
 
     if (state == Contemplates)
     {
@@ -61,12 +103,14 @@ void Philosopher::iconGenerator(int finalObjX, int finalObjY)
     else if (state == WaitsForEating)
     {
         attron(COLOR_PAIR(WAITING_COLOR));
-        mvprintw(finalObjY - 1, finalObjX, "%s", "Waits");
+        mvprintw(finalObjY - 1, finalObjX, "%s%d", "Waits ", waitingTime);
         attroff(COLOR_PAIR(WAITING_COLOR));
     }
     else if (state == Eats)
     {
-        mvprintw(finalObjY - 1, finalObjX, "%s", "Eats");
+        attron(COLOR_PAIR(EATING_COLOR));
+        mvprintw(finalObjY - 1, finalObjX, "%s %d%%", "Eats", eatingPercent);
+        attroff(COLOR_PAIR(EATING_COLOR));
     }
 
     attron(COLOR_PAIR(PHILOSOPHER_COLOR));
@@ -89,6 +133,15 @@ void Philosopher::iconGenerator(int finalObjX, int finalObjY)
             {
                 mvaddch(finalObjY + y, finalObjX + x, 'P');
             }
+        }
+
+        if (this->leftForkTaken)
+        {
+            mvprintw(finalObjY + height / 2, finalObjX - 4, "%s", "<<");
+        }
+        if (this->rightForkTaken)
+        {
+            mvprintw(finalObjY + height / 2, finalObjX + width + 2, "%s", ">>");
         }
     }
 
