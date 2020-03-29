@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 
 	std::vector<VisibleObject *> objects;
 	std::vector<std::thread *> threads;
-	Table t = Table(30, 15, 10, 2.0, 1.0);
+	Table t = Table(30, 15, 12, 2.0, 1.0);
 
 	int numOfPhilosophers = 5;
 	int eatingTime = 2;
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 		}
 
 		RefPoint *forkRef = new RefPoint(0, 0);
-		Fork *forkObj = new Fork(forkRef);
+		Fork *forkObj = new Fork(forkRef, a);
 		objects.push_back(forkObj);
 		t.AddElement(forkRef);
 		lastFork = forkObj;

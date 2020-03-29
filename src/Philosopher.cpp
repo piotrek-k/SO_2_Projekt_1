@@ -74,10 +74,10 @@ void Philosopher::SimulateLife(int eatingTime, int contemplatingTime)
             break;
         }
         availableForks[0]->PickUpSync();
-        leftForkTaken = true;
+        lowerIndexForkTaken = true;
         numOfCollectedForks++;
         availableForks[1]->PickUpSync();
-        rightForkTaken = true;
+        higherIndexForkTaken = true;
         if (keepAlive)
             this->redraw();
         numOfCollectedForks++;
@@ -89,8 +89,8 @@ void Philosopher::SimulateLife(int eatingTime, int contemplatingTime)
         std::this_thread::sleep_for(std::chrono::milliseconds(eatingLength));
         availableForks[1]->PutDown();
         availableForks[0]->PutDown();
-        leftForkTaken = false;
-        rightForkTaken = false;
+        lowerIndexForkTaken = false;
+        higherIndexForkTaken = false;
         numOfCollectedForks = 0;
         waitingTime = 0;
     }
@@ -142,15 +142,16 @@ void Philosopher::iconGenerator(int finalObjX, int finalObjY)
                 mvaddch(finalObjY + y, finalObjX + x, 'P');
             }
         }
+    }
 
-        if (this->leftForkTaken)
-        {
-            mvprintw(finalObjY + height / 2, finalObjX - 4, "%s", "<<");
-        }
-        if (this->rightForkTaken)
-        {
-            mvprintw(finalObjY + height / 2, finalObjX + width + 2, "%s", ">>");
-        }
+    if(lowerIndexForkTaken){
+        mvprintw(finalObjY + (height/2), finalObjX + width, " (%d)", availableForks[0]->GetId());
+    }
+    if(higherIndexForkTaken){
+        mvprintw(finalObjY + (height/2), finalObjX + width, " (%d)", availableForks[1]->GetId());
+    }
+    if(lowerIndexForkTaken && higherIndexForkTaken){
+        mvprintw(finalObjY + (height/2), finalObjX + width, " (%d)(%d)", availableForks[0]->GetId(), availableForks[1]->GetId());
     }
 
     attroff(COLOR_PAIR(PHILOSOPHER_COLOR));

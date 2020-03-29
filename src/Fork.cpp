@@ -2,39 +2,38 @@
 #include <curses.h>
 #include "Globals.h"
 
-Fork::Fork(RefPoint *refpoint) : VisibleObject(refpoint)
+Fork::Fork(RefPoint *refpoint, int id) : VisibleObject(refpoint)
 {
     this->width = 3;
     this->height = 3;
-}
-
-bool Fork::TryToPickUp()
-{
-    if (this->mtx.try_lock())
-    {
-        // not locked
-
-        state = Taken;
-        this->redraw();
-
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    this->id = id;
 }
 
 void Fork::PickUpSync()
 {
-    this->mtx.lock();
+    //this->mtx.lock();
+    std::unique_lock<std::mutex> ulock(mtx);
+    if (state == Taken)
+    {
+        cv.emplace(); // dodaj na koniec kolejki
+        cv.back().wait(ulock);
+    }
+
     state = Taken;
     this->redraw();
 }
 
 void Fork::PutDown()
 {
-    this->mtx.unlock();
+    //this->mtx.unlock();
+    std::unique_lock<std::mutex> ulock(mtx);
+
+    if (!cv.empty())
+    {
+        cv.front().notify_one();
+        cv.pop();
+    }
+
     state = Free;
     this->redraw();
 }
@@ -45,12 +44,12 @@ void Fork::iconGenerator(int finalObjX, int finalObjY)
 
     if (state == Free)
     {
-        mvprintw(finalObjY - 1, finalObjX, "%s", "Free");
+        mvprintw(finalObjY - 1, finalObjX, "(%d) %s", id, "Free");
         attron(COLOR_PAIR(FREE_COLOR));
     }
     else if (state == Taken)
     {
-        mvprintw(finalObjY - 1, finalObjX, "%s", "Taken");
+        mvprintw(finalObjY - 1, finalObjX, "(%d) %s", id, "Taken");
     }
 
     for (int x = 0; x < width; x++)
@@ -80,4 +79,8 @@ void Fork::iconGenerator(int finalObjX, int finalObjY)
     }
 
     attroff(COLOR_PAIR(FORK_COLOR));
+}
+
+int Fork::GetId(){
+    return id;
 }

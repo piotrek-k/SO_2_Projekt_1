@@ -20,8 +20,8 @@ private:
     std::vector<Fork *> availableForks;
     bool keepAlive = true;
     int numOfCollectedForks = 0;
-    bool leftForkTaken = false;
-    bool rightForkTaken = false;
+    bool lowerIndexForkTaken = false;
+    bool higherIndexForkTaken = false;
 
 public:
     int waitingTime = 0;
